@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrador | CETPRO</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell admin-shell-focused">
+  <aside class="admin-sidebar">
+    <div class="admin-brand"><div class="logo-mark"><img src="assets/img/logo-cetpro.png" alt="Logo CETPRO"></div><div><h2 style="margin:0;line-height:1">CETPRO<br>Ernesto Reyna Zegarra</h2><small>Panel interno</small></div></div>
+    <nav class="admin-nav">
+      <a class="active" href="#dashboard">▦ Resumen</a>
+      <a href="#docentesAdmin">👨‍🏫 Docentes</a>
+      <a href="#matriculaAdmin">▤ Matrícula</a>
+      <a href="#postulantesAdmin">🧾 Postulantes</a>
+      <a href="index.html">🌐 Ver sitio web</a>
+      <a href="#" id="logoutBtn" class="logout-top">↪ Cerrar sesión</a>
+    </nav>
+    <div class="admin-help"><h3>Importante</h3><p>Inicio y Programas quedan fijos. El personal solo administra docentes y matrícula.</p></div>
+  </aside>
+
+  <main class="admin-main" id="dashboard">
+    <div class="admin-top"><div><h1>Panel interno del CETPRO 👋</h1><p class="muted">Administra solo lo necesario para que el personal no toque código.</p></div><span>🗓 Gestión administrativa</span></div>
+    <div class="success-banner"><strong>✅ Configuración segura para el personal administrativo.</strong><span class="badge">Sin editar código</span></div>
+
+    <section class="grid stat-grid admin-stats-small">
+      <article class="stat-card card"><div class="icon-circle">👨‍🏫</div><strong id="teacherCount">0</strong><span class="muted">Docentes registrados</span><p>Se muestran en Nosotros</p></article>
+      <article class="stat-card card"><div class="icon-circle icon-blue">▤</div><strong id="matriculaStatusText">Activa</strong><span class="muted">Estado matrícula</span><p>Controla el formulario público</p></article>
+      <article class="stat-card card"><div class="icon-circle icon-yellow">🧾</div><strong id="enrollmentCount">0</strong><span class="muted">Postulantes registrados</span><p>Guardados por carrera</p></article>
+    </section>
+
+    <section id="docentesAdmin" class="admin-section card">
+      <div class="section-admin-head"><div><h2>Equipo directivo y docentes</h2><p class="muted">Aquí el personal del CETPRO puede agregar, editar o eliminar docentes que aparecen en la página Nosotros.</p></div></div>
+      <form id="teacherForm" class="admin-grid-form">
+        <input type="hidden" name="index" value="">
+        <label>Nombre completo *<input class="form-control" name="nombre" placeholder="Ejemplo: Lic. Ana Pérez Rojas" required></label>
+        <label>Cargo o especialidad *<input class="form-control" name="cargo" placeholder="Ejemplo: Docente de Electricidad" required></label>
+        <label>Área / Carrera<input class="form-control" name="area" placeholder="Ejemplo: Electricidad"></label>
+        <button class="btn btn-primary" type="submit">Guardar docente</button>
+        <button class="btn btn-outline" type="button" id="clearTeacherForm">Limpiar</button>
+      </form>
+      <div class="admin-table-wrap"><table class="table" id="teachersTable"><thead><tr><th>Docente</th><th>Cargo</th><th>Área</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section id="matriculaAdmin" class="admin-section card">
+      <div class="section-admin-head"><div><h2>Control de matrícula</h2><p class="muted">Activa o desactiva el formulario público de inscripción.</p></div></div>
+      <div class="admin-matricula-control enhanced">
+        <label class="switch-row"><input type="checkbox" id="matriculaToggle"> <span>Habilitar matrícula en la web</span></label>
+        <p id="matriculaAdminMessage" class="muted">Cuando esté desactivado, el público verá un aviso ordenado y no podrá enviar inscripciones.</p>
+      </div>
+      <div class="grid grid-2 matricula-preview-boxes">
+        <div class="card mini-preview"><h3>Cuando está habilitado</h3><p>El postulante verá el formulario con nombre completo, DNI, celular, correo opcional, carrera técnica y mensaje.</p></div>
+        <div class="card mini-preview"><h3>Cuando está deshabilitado</h3><p>El visitante verá una pantalla informativa de matrícula cerrada, sin perder la navegación hacia Programas y Contacto.</p></div>
+      </div>
+    </section>
+
+    <section id="postulantesAdmin" class="admin-section card">
+      <div class="section-admin-head"><div><h2>Postulantes inscritos</h2><p class="muted">Solicitudes registradas desde la página Matrícula. Puedes filtrarlas por carrera.</p></div><button class="btn btn-outline" id="exportEnrollments" type="button">Descargar lista</button></div>
+      <div class="toolbar"><label class="search-box">⌕<input id="enrollmentSearch" placeholder="Buscar por nombre, DNI, celular o carrera..."></label><select id="careerFilter" class="form-control admin-select"><option value="">Todas las carreras</option><option>Mecánica de Producción (Soldadura)</option><option>Carpintería</option><option>Electricidad</option><option>Industria del Vestido</option></select></div>
+      <div class="grid grid-4 career-counts" id="careerCounts"></div>
+      <div class="admin-table-wrap"><table class="table" id="enrollmentsTable"><thead><tr><th>Fecha</th><th>Nombre completo</th><th>DNI</th><th>Celular</th><th>Correo</th><th>Carrera</th><th>Mensaje</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
+    </section>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
