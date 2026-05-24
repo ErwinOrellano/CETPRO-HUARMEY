@@ -85,3 +85,12 @@ El administrador puede habilitar o deshabilitar la matrícula desde `admin.html`
 - El formulario de matrícula guarda postulantes en `localStorage` y el panel los muestra por carrera.
 - Se eliminó la selección de horario porque el horario ya está definido por carrera.
 - El acceso interno queda como candado discreto al final de Inicio.
+
+
+## Ajuste responsive solicitado
+
+- Se agregó la imagen enviada como `assets/img/logo-cetpro.png`.
+- El logo superior izquierdo de todas las páginas usa esa imagen.
+- En `nosotros.html`, el cuadro izquierdo de “Quiénes somos” usa la misma imagen institucional.
+- Se reforzó el responsive para laptop, tablet y celular sin cambiar colores ni imágenes de fondo.
+- Se mantuvieron las páginas HTML, Firebase, el panel administrador y el diseño original.

@@ -211,3 +211,111 @@ button,input,textarea{font:inherit}
 .admin-grid-form{display:grid;grid-template-columns:1.2fr 1fr 1fr auto auto;gap:12px;align-items:end;margin-bottom:18px}.admin-grid-form label{font-weight:800}.admin-grid-form .form-control{margin-bottom:0}.btn-small{padding:8px 10px;font-size:.85rem}.admin-table-wrap{overflow:auto;border:1px solid var(--borde);border-radius:14px}.admin-table-wrap .table th{white-space:nowrap}.enhanced{border:1px solid var(--borde);border-radius:14px;background:#fbfdff;padding:18px}.mini-preview{padding:18px;background:#fbfdff}.mini-preview h3{margin:0 0 6px}.admin-select{max-width:310px;margin-bottom:0}.career-counts{margin:0 0 16px}.career-count-card{padding:16px}.career-count-card strong{display:block;font-size:1.7rem;color:var(--turquesa)}.career-count-card span{font-size:.9rem;font-weight:800}.staff-card p{margin-bottom:0}.staff-card .muted{font-size:.85rem}.topbar-right .admin-access{display:none!important}
 @media (max-width:1100px){.admin-grid-form{grid-template-columns:1fr 1fr}.admin-stats-small{grid-template-columns:1fr}.admin-shell-focused{grid-template-columns:1fr}.admin-sidebar{height:auto;position:relative}.admin-select{max-width:none}}
 @media (max-width:720px){.admin-grid-form{grid-template-columns:1fr}.section-admin-head{flex-direction:column}.admin-lock-wrap{text-align:center}.career-counts{grid-template-columns:1fr!important}}
+
+
+/* =========================================================
+   REFINAMIENTO RESPONSIVE GLOBAL - 2026
+   No cambia paleta ni imágenes de fondo. Solo mejora proporciones,
+   navegación, logo institucional y adaptación en laptop, tablet y celular.
+   ========================================================= */
+html{font-size:clamp(14px, .88vw + 10px, 16px)}
+body{overflow-x:hidden}
+.container{width:min(var(--ancho), calc(100% - clamp(24px,4vw,44px)))}
+
+.logo{flex-shrink:0;max-width:100%}
+.logo-mark{flex:0 0 auto;background:#1e59a8}
+.logo-mark img{object-fit:contain;padding:3px;background:#1e59a8}
+.navbar .container{flex-wrap:nowrap}
+.menu{min-width:0;justify-content:flex-end;gap:clamp(12px,1.6vw,26px)}
+.menu a{white-space:nowrap}
+.search-icon{flex:0 0 auto}
+
+.hero-home h1{font-size:clamp(2rem,4vw,3.15rem)}
+.hero-page h1{font-size:clamp(2rem,4vw,3rem)}
+.hero-home p,.hero-page p{font-size:clamp(1rem,1.4vw,1.14rem)}
+.card{min-width:0}
+.table{width:100%;border-collapse:collapse}
+.admin-table-wrap,.doc-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+.about-main{align-items:stretch}
+.about-photo{
+  min-height:260px;
+  background:#1e59a8 url("assets/img/logo-cetpro.png") center/contain no-repeat !important;
+  background-size:contain !important;
+  padding:10px;
+}
+.footer .logo-mark img,.navbar .logo-mark img,.login-card .logo-mark img,.admin-brand .logo-mark img{object-fit:contain;padding:3px;background:#1e59a8}
+
+@media (max-width:1200px){
+  .navbar .container{gap:14px}
+  .menu{gap:14px;font-size:.88rem}
+  .logo h2{font-size:1.36rem}
+  .logo span{font-size:.72rem}
+  .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:980px){
+  .navbar{height:auto;position:sticky;top:0}
+  .navbar .container{min-height:76px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px}
+  .menu-toggle{display:inline-flex;align-items:center;justify-content:center;grid-column:2}
+  .search-icon{grid-column:3}
+  .menu{
+    position:absolute;left:clamp(12px,3vw,22px);right:clamp(12px,3vw,22px);top:calc(100% + 8px);
+    background:#fff;border:1px solid var(--borde);border-radius:14px;box-shadow:var(--sombra);
+    padding:10px;display:none;flex-direction:column;align-items:stretch;gap:0;z-index:100;
+    max-height:calc(100vh - 110px);overflow-y:auto;
+  }
+  .menu.open{display:flex}
+  .menu a{padding:13px 12px;border-radius:9px}
+  .menu a.active::after,.menu a:hover::after{display:none}
+  .menu a:hover,.menu a.active{background:var(--azul-100)}
+  .about-main{grid-template-columns:1fr 1fr}
+  .about-photo{min-height:300px}
+  .news-feature{grid-template-columns:1fr}
+  .matricula-layout,.news-layout,.doc-layout,.contact-grid{grid-template-columns:1fr}
+}
+
+@media (max-width:760px){
+  .topbar{display:none}
+  .navbar{padding:8px 0}
+  .navbar .container{grid-template-columns:1fr auto;min-height:66px;align-items:center}
+  .search-icon{display:none}
+  .logo{gap:9px}
+  .logo-mark{width:50px;height:50px;border-radius:12px;border-width:2px}
+  .logo h2{font-size:1.05rem;line-height:1}
+  .logo span{font-size:.66rem;line-height:1.15}
+  .menu{top:calc(100% + 6px)}
+  .hero-home{min-height:360px;padding:44px 0;background-position:center}
+  .hero-page{min-height:190px;padding:34px 0;background-position:center}
+  .features{margin-top:16px}
+  .feature-card{align-items:flex-start}
+  .grid-2,.grid-3,.grid-4,.about-main,.career-icons,.values,.staff,.faq,.footer-top,.footer-bottom,.albums,.stat-grid,.admin-shell{grid-template-columns:1fr!important}
+  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .about-photo{min-height:260px;order:0}
+  .about-main > div:nth-child(2){order:1}
+  .about-box{padding:18px}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .filters{display:flex;overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;scroll-snap-type:x proximity}
+  .filter{white-space:nowrap;scroll-snap-align:start}
+  .form-row{grid-template-columns:1fr!important}
+  .cta{flex-direction:column;align-items:stretch;text-align:center}
+  .cta .btn{width:100%}
+  .admin-main{padding:18px!important}
+}
+
+@media (max-width:520px){
+  .container{width:calc(100% - 22px)}
+  .logo-mark{width:46px;height:46px}
+  .logo h2{font-size:.98rem}
+  .logo span{display:none}
+  .hero-home{min-height:330px;padding:36px 0}
+  .hero-home h1,.hero-page h1{font-size:1.82rem}
+  .hero-home p,.hero-page p{font-size:.98rem}
+  .btn{width:100%;padding:12px 14px}
+  .gallery-grid,.news-list{grid-template-columns:1fr!important}
+  .program-img{height:150px}
+  .gallery-photo{height:170px}
+  .about-photo{min-height:230px}
+  .icon-circle{width:48px;height:48px;font-size:1.35rem}
+  .login-card{padding:22px}
+}
