@@ -319,3 +319,388 @@ body{overflow-x:hidden}
   .icon-circle{width:48px;height:48px;font-size:1.35rem}
   .login-card{padding:22px}
 }
+
+
+/* =========================================================
+   PARCHE RESPONSIVE EXTRA - CELULAR / TABLET / LAPTOP
+   Mantiene colores e imágenes. Solo corrige adaptación de pantalla.
+   ========================================================= */
+
+/* Evita que algún bloque ancho rompa la pantalla en celulares */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
+body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Contenedor fluido y seguro */
+.container {
+  width: min(var(--ancho), calc(100% - clamp(20px, 5vw, 44px))) !important;
+  max-width: var(--ancho);
+}
+
+/* Cabecera: evita que el logo + menú fuercen ancho */
+.navbar, .topbar { width: 100%; max-width: 100%; }
+.navbar .container, .topbar .container { max-width: var(--ancho); }
+.logo {
+  min-width: 0 !important;
+  max-width: 100%;
+  overflow: hidden;
+}
+.logo > div:last-child { min-width: 0; }
+.logo h2, .logo span {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Imágenes del logo sin deformar */
+.logo-mark img,
+.admin-brand .logo-mark img,
+.login-card .logo-mark img,
+.footer .logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+}
+
+/* Grids generales: nunca se salen de pantalla */
+.grid, .grid-2, .grid-3, .grid-4,
+.news-layout, .doc-layout, .contact-grid,
+.matricula-layout, .about-main, .news-feature,
+.schedule-strip, .albums, .gallery-grid, .news-list {
+  max-width: 100%;
+}
+
+/* Tablas con scroll horizontal sin romper el celular */
+.table { min-width: 720px; }
+.doc-table,
+.admin-table-wrap,
+.table-wrap,
+.postulants-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Formularios no deben desbordar */
+.form-control, input, textarea, select, button {
+  max-width: 100%;
+}
+.form-row { min-width: 0; }
+
+/* Laptop mediana */
+@media (max-width: 1180px) {
+  .navbar .container {
+    gap: 12px;
+  }
+  .menu {
+    gap: 13px !important;
+    font-size: .86rem !important;
+  }
+  .logo-mark {
+    width: 56px;
+    height: 56px;
+  }
+  .logo h2 {
+    font-size: 1.22rem !important;
+  }
+  .logo span {
+    font-size: .68rem !important;
+  }
+  .grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet y celulares grandes */
+@media (max-width: 980px) {
+  .topbar {
+    display: none !important;
+  }
+
+  .navbar {
+    height: auto !important;
+    min-height: 72px;
+    padding: 8px 0;
+  }
+
+  .navbar .container {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 42px;
+    padding: 0;
+    grid-column: 2;
+  }
+
+  .search-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 3;
+    width: 38px;
+  }
+
+  .menu {
+    position: absolute !important;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: none !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    padding: 10px !important;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--sombra);
+    z-index: 999;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+
+  .menu.open {
+    display: flex !important;
+  }
+
+  .menu a {
+    padding: 13px 12px !important;
+    border-radius: 10px;
+    white-space: normal !important;
+  }
+
+  .menu a.active::after,
+  .menu a:hover::after {
+    display: none !important;
+  }
+
+  .menu a.active,
+  .menu a:hover {
+    background: var(--azul-100);
+  }
+
+  .hero-home {
+    min-height: 340px !important;
+    padding: 44px 0 !important;
+    background-position: center center !important;
+  }
+
+  .hero-page {
+    min-height: 190px !important;
+    padding: 34px 0 !important;
+    background-position: center center !important;
+  }
+
+  .hero-home h1,
+  .hero-page h1 {
+    max-width: 100%;
+  }
+
+  .grid-2, .grid-3, .grid-4,
+  .about-main, .career-icons, .values,
+  .staff, .faq, .footer-top, .footer-bottom,
+  .schedule-strip, .albums,
+  .matricula-layout, .news-layout, .doc-layout,
+  .contact-grid, .news-feature {
+    grid-template-columns: 1fr !important;
+  }
+
+  .news-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .about-photo {
+    min-height: 260px !important;
+    width: 100%;
+  }
+
+  .toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filters {
+    max-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .cta {
+    flex-direction: column !important;
+    text-align: center;
+    align-items: stretch !important;
+  }
+
+  .cta .btn {
+    width: 100%;
+  }
+
+  .admin-shell,
+  .admin-shell-focused {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-sidebar {
+    position: relative !important;
+    height: auto !important;
+  }
+
+  .admin-main {
+    padding: 18px !important;
+  }
+}
+
+/* Celulares */
+@media (max-width: 640px) {
+  .container {
+    width: calc(100% - 22px) !important;
+  }
+
+  .navbar {
+    min-height: 66px;
+  }
+
+  .navbar .container {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .search-icon {
+    display: none !important;
+  }
+
+  .logo {
+    gap: 8px !important;
+  }
+
+  .logo-mark {
+    width: 48px !important;
+    height: 48px !important;
+    border-width: 2px !important;
+    border-radius: 12px !important;
+  }
+
+  .logo h2 {
+    font-size: .98rem !important;
+    line-height: 1.02 !important;
+  }
+
+  .logo span {
+    display: none !important;
+  }
+
+  .hero-home {
+    min-height: 320px !important;
+    padding: 36px 0 !important;
+  }
+
+  .hero-home h1,
+  .hero-page h1 {
+    font-size: clamp(1.7rem, 8vw, 2.05rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .hero-home p,
+  .hero-page p {
+    font-size: .98rem !important;
+  }
+
+  .section-title {
+    font-size: 1.45rem !important;
+  }
+
+  .feature-card {
+    padding: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  .program-img {
+    height: 150px !important;
+  }
+
+  .gallery-photo {
+    height: 160px !important;
+  }
+
+  .news-list,
+  .gallery-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-row,
+  .admin-grid-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px 14px;
+  }
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+    font-size: 1.32rem;
+  }
+
+  .login-card {
+    width: calc(100% - 22px) !important;
+    padding: 22px !important;
+  }
+
+  .modal-box,
+  .search-panel-inner {
+    width: calc(100% - 22px) !important;
+    max-width: calc(100% - 22px) !important;
+  }
+}
+
+/* Celulares pequeños */
+@media (max-width: 390px) {
+  .logo-mark {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .logo h2 {
+    font-size: .9rem !important;
+  }
+
+  .hero-home h1,
+  .hero-page h1 {
+    font-size: 1.55rem !important;
+  }
+
+  .card, .program-body, .news-content, .sidebar-box {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
