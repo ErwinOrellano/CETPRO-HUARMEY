@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Panel Administrador | CETPRO</title>
-  <link rel="stylesheet" href="styles.css?v=admin-ordenado-firebase-storage-20260530">
+  <link rel="stylesheet" href="styles.css?v=admin-mobile-final-20260524">
 </head>
 <body class="admin-body">
 <div class="admin-shell admin-shell-focused">
@@ -13,15 +13,12 @@
     <nav class="admin-nav">
       <a class="active" href="#dashboard">▦ Resumen</a>
       <a href="#docentesAdmin">👨‍🏫 Docentes</a>
-      <a href="#inscripcionAdmin">▤ Inscripción</a>
+      <a href="#matriculaAdmin">▤ Matrícula</a>
       <a href="#postulantesAdmin">🧾 Postulantes</a>
-      <a href="#noticiasAdmin">📰 Noticias</a>
-      <a href="#galeriaAdmin">🖼 Galería</a>
-      <a href="#documentosAdmin">📄 Documentos</a>
       <a href="index.html">🌐 Ver sitio web</a>
       <a href="#" id="logoutBtn" class="logout-top">↪ Cerrar sesión</a>
     </nav>
-    <div class="admin-help"><h3>Importante</h3><p>Inicio y Programas quedan fijos. El personal puede administrar docentes, inscripción, postulantes, noticias, galería y documentos.</p></div>
+    <div class="admin-help"><h3>Importante</h3><p>Inicio y Programas quedan fijos. El personal solo administra docentes y matrícula.</p></div>
   </aside>
 
   <main class="admin-main" id="dashboard">
@@ -30,7 +27,7 @@
 
     <section class="grid stat-grid admin-stats-small">
       <article class="stat-card card"><div class="icon-circle">👨‍🏫</div><strong id="teacherCount">0</strong><span class="muted">Docentes registrados</span><p>Se muestran en Nosotros</p></article>
-      <article class="stat-card card"><div class="icon-circle icon-blue">▤</div><strong id="inscripcionStatusText">Activa</strong><span class="muted">Estado inscripción</span><p>Controla el formulario público</p></article>
+      <article class="stat-card card"><div class="icon-circle icon-blue">▤</div><strong id="matriculaStatusText">Activa</strong><span class="muted">Estado matrícula</span><p>Controla el formulario público</p></article>
       <article class="stat-card card"><div class="icon-circle icon-yellow">🧾</div><strong id="enrollmentCount">0</strong><span class="muted">Postulantes registrados</span><p>Guardados por carrera</p></article>
     </section>
 
@@ -41,78 +38,32 @@
         <label>Nombre completo *<input class="form-control" name="nombre" placeholder="Ejemplo: Lic. Ana Pérez Rojas" required></label>
         <label>Cargo o especialidad *<input class="form-control" name="cargo" placeholder="Ejemplo: Docente de Electricidad" required></label>
         <label>Área / Carrera<input class="form-control" name="area" placeholder="Ejemplo: Electricidad"></label>
-        <label>Foto del docente<input type="hidden" name="foto" value=""><input class="form-control" type="file" name="fotoArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se subirá a Firebase Storage.</small></label>
         <button class="btn btn-primary" type="submit">Guardar docente</button>
         <button class="btn btn-outline" type="button" id="clearTeacherForm">Limpiar</button>
       </form>
-      <div class="admin-table-wrap"><table class="table" id="teachersTable"><thead><tr><th>Foto</th><th>Docente</th><th>Cargo</th><th>Área</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
+      <div class="admin-table-wrap"><table class="table" id="teachersTable"><thead><tr><th>Docente</th><th>Cargo</th><th>Área</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
     </section>
 
-    <section id="inscripcionAdmin" class="admin-section card">
-      <div class="section-admin-head"><div><h2>Control de inscripción</h2><p class="muted">Activa o desactiva el formulario público de inscripción.</p></div></div>
-      <div class="admin-inscripcion-control enhanced">
-        <label class="switch-row"><input type="checkbox" id="inscripcionToggle"> <span>Habilitar inscripción en la web</span></label>
-        <p id="inscripcionAdminMessage" class="muted">Cuando esté desactivado, el público verá un aviso ordenado y no podrá enviar inscripciones.</p>
+    <section id="matriculaAdmin" class="admin-section card">
+      <div class="section-admin-head"><div><h2>Control de matrícula</h2><p class="muted">Activa o desactiva el formulario público de inscripción.</p></div></div>
+      <div class="admin-matricula-control enhanced">
+        <label class="switch-row"><input type="checkbox" id="matriculaToggle"> <span>Habilitar matrícula en la web</span></label>
+        <p id="matriculaAdminMessage" class="muted">Cuando esté desactivado, el público verá un aviso ordenado y no podrá enviar inscripciones.</p>
       </div>
-      <div class="grid grid-2 inscripcion-preview-boxes">
+      <div class="grid grid-2 matricula-preview-boxes">
         <div class="card mini-preview"><h3>Cuando está habilitado</h3><p>El postulante verá el formulario con nombre completo, DNI, celular, correo opcional, carrera técnica y mensaje.</p></div>
-        <div class="card mini-preview"><h3>Cuando está deshabilitado</h3><p>El visitante verá una pantalla informativa de inscripción cerrada, sin perder la navegación hacia Programas y Contacto.</p></div>
+        <div class="card mini-preview"><h3>Cuando está deshabilitado</h3><p>El visitante verá una pantalla informativa de matrícula cerrada, sin perder la navegación hacia Programas y Contacto.</p></div>
       </div>
     </section>
 
     <section id="postulantesAdmin" class="admin-section card">
-      <div class="section-admin-head"><div><h2>Postulantes inscritos</h2><p class="muted">Solicitudes registradas desde la página Inscripción. Puedes filtrarlas por carrera.</p></div><button class="btn btn-outline" id="exportEnrollments" type="button">Descargar lista</button></div>
+      <div class="section-admin-head"><div><h2>Postulantes inscritos</h2><p class="muted">Solicitudes registradas desde la página Matrícula. Puedes filtrarlas por carrera.</p></div><button class="btn btn-outline" id="exportEnrollments" type="button">Descargar lista</button></div>
       <div class="toolbar"><label class="search-box">⌕<input id="enrollmentSearch" placeholder="Buscar por nombre, DNI, celular o carrera..."></label><select id="careerFilter" class="form-control admin-select"><option value="">Todas las carreras</option><option>Mecánica de Producción (Soldadura)</option><option>Carpintería</option><option>Electricidad</option><option>Industria del Vestido</option></select></div>
       <div class="grid grid-4 career-counts" id="careerCounts"></div>
       <div class="admin-table-wrap"><table class="table" id="enrollmentsTable"><thead><tr><th>Fecha</th><th>Nombre completo</th><th>DNI</th><th>Celular</th><th>Correo</th><th>Carrera</th><th>Mensaje</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
     </section>
-
-    <section id="noticiasAdmin" class="admin-section card">
-      <div class="section-admin-head"><div><h2>Noticias y comunicados</h2><p class="muted">Agrega, edita o elimina noticias que aparecerán en la página Noticias.</p></div></div>
-      <form id="newsForm" class="admin-grid-form">
-        <input type="hidden" name="index" value="">
-        <label>Título de la noticia *<input class="form-control" name="titulo" placeholder="Ejemplo: Semana técnica de Electricidad" required></label>
-        <label>Categoría<input class="form-control" name="categoria" placeholder="Ejemplo: Electricidad, Aniversario"></label>
-        <label>Fecha<input class="form-control" name="fecha" placeholder="Ejemplo: 30/05/2026"></label>
-        <label>Imagen de la noticia<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una imagen desde tu computadora. Se subirá a Firebase Storage.</small></label>
-        <label class="admin-form-wide">Resumen *<textarea class="form-control" name="resumen" placeholder="Escribe el resumen de la noticia" required></textarea></label>
-        <button class="btn btn-primary" type="submit">Guardar noticia</button>
-        <button class="btn btn-outline" type="button" id="clearNewsForm">Limpiar</button>
-      </form>
-      <div class="admin-table-wrap"><table class="table" id="newsTable"><thead><tr><th>Imagen</th><th>Título</th><th>Categoría</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
-    </section>
-
-    <section id="galeriaAdmin" class="admin-section card">
-      <div class="section-admin-head"><div><h2>Galería institucional</h2><p class="muted">Agrega o elimina fotos para la página Galería.</p></div></div>
-      <form id="galleryForm" class="admin-grid-form">
-        <input type="hidden" name="index" value="">
-        <label>Título de la foto *<input class="form-control" name="titulo" placeholder="Ejemplo: Práctica de soldadura" required></label>
-        <label>Categoría<input class="form-control" name="categoria" placeholder="Ejemplo: Soldadura, Carpintería"></label>
-        <label>Imagen *<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se subirá a Firebase Storage.</small></label>
-        <label>Descripción<input class="form-control" name="descripcion" placeholder="Breve descripción de la actividad"></label>
-        <button class="btn btn-primary" type="submit">Guardar foto</button>
-        <button class="btn btn-outline" type="button" id="clearGalleryForm">Limpiar</button>
-      </form>
-      <div class="admin-table-wrap"><table class="table" id="galleryTable"><thead><tr><th>Imagen</th><th>Título</th><th>Categoría</th><th>Descripción</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
-    </section>
-
-    <section id="documentosAdmin" class="admin-section card">
-      <div class="section-admin-head"><div><h2>Documentos institucionales</h2><p class="muted">Agrega, edita o elimina documentos para la página Documentos.</p></div></div>
-      <form id="documentForm" class="admin-grid-form">
-        <input type="hidden" name="index" value="">
-        <label>Nombre del documento *<input class="form-control" name="nombre" placeholder="Ejemplo: Requisitos de inscripción" required></label>
-        <label>Tipo<input class="form-control" name="tipo" placeholder="Ejemplo: PDF, DOC, Formato"></label>
-        <label>Fecha<input class="form-control" name="fecha" placeholder="Ejemplo: 30/05/2026"></label>
-        <label>Archivo del documento<input type="hidden" name="url" value=""><input class="form-control" type="file" name="documentoArchivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"><small class="muted">Selecciona el archivo desde tu computadora. Se subirá a Firebase Storage.</small></label>
-        <label class="admin-form-wide">Descripción *<textarea class="form-control" name="descripcion" placeholder="Describe brevemente el documento" required></textarea></label>
-        <button class="btn btn-primary" type="submit">Guardar documento</button>
-        <button class="btn btn-outline" type="button" id="clearDocumentForm">Limpiar</button>
-      </form>
-      <div class="admin-table-wrap"><table class="table" id="managedDocumentsTable"><thead><tr><th>Documento</th><th>Descripción</th><th>Fecha</th><th>Tipo</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
-    </section>
-
   </main>
 </div>
-<script type="module" src="script.js?v=admin-ordenado-firebase-storage-20260530"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>

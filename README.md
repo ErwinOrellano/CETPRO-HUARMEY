@@ -1,51 +1,96 @@
-# CETPRO Ernesto Reyna Zegarra - Firebase completo
+# CETPRO Ernesto Reyna Zegarra - HTML + CSS
 
-Este proyecto mantiene el diseño original del sitio web, pero el contenido administrable está preparado para trabajar con **Firebase Authentication**, **Cloud Firestore** y **Firebase Storage**.
+Proyecto base estático con interfaces públicas y panel administrativo visual.
 
-## Cambios principales
+## Archivos incluidos
 
-- El menú superior mantiene siempre la opción **Programas**.
-- En el sitio público se cambió **Inscripción** por **Inscripción**.
-- El formulario público se mantiene en `matricula.html`, pero visualmente aparece como **Inscripción**.
-- No se agregó otro archivo de inscripción; se conserva `matricula.html` para no romper Firebase ni enlaces existentes.
-- El panel interno ya no usa guardado local para el contenido administrable.
+- `index.html`: portada principal.
+- `nosotros.html`: página institucional.
+- `programas.html`: programas/carreras técnicas.
+- `matricula.html`: formulario público de inscripción controlado desde el panel administrador.
+- `noticias.html`: noticias y comunicados.
+- `galeria.html`: galería institucional.
+- `documentos.html`: documentos disponibles.
+- `contacto.html`: contacto y formulario.
+- `admin.html`: panel visual de administración.
+- `styles.css`: estilos globales reutilizables.
 
-## Panel interno
+## Cómo abrir
 
-Desde `admin.html`, el personal autorizado puede administrar:
+1. Descomprime el archivo ZIP.
+2. Abre `index.html` en Visual Studio Code.
+3. Clic derecho sobre `index.html` y selecciona **Open with Live Server**.
 
-- Docentes: agregar, editar, eliminar y subir foto desde la computadora.
-- Inscripción: activar o desactivar el formulario público.
-- Postulantes: revisar postulantes registrados por carrera.
-- Noticias: agregar, editar, eliminar y subir imagen desde la computadora.
-- Galería: agregar, eliminar y subir fotos desde la computadora.
-- Documentos: agregar, editar, eliminar y subir archivos PDF, Word, Excel, PowerPoint o imágenes desde la computadora.
+## Nota
 
-## Firebase usado
+Las imágenes están referenciadas desde URLs externas de ejemplo. Para producción, crea una carpeta `assets/img/` y reemplaza las URLs por imágenes propias del CETPRO.
 
-### Firestore
 
-Colecciones/documentos usados:
+## Versión funcional mejorada
 
-- `docentes`
-- `postulantes`
-- `noticias`
-- `galeria`
-- `documentos`
-- `mensajes`
-- `configuracion / matricula`
+Esta carpeta mantiene el diseño de la primera versión que te gustó y agrega funcionalidad con `script.js`.
 
-### Storage
+### ¿Dónde entra el administrador?
 
-Carpetas usadas:
+En la portada principal, en la barra azul superior, aparece el botón:
 
-- `docentes/`
-- `noticias/`
-- `galeria/`
-- `documentos/`
+`🔐 Acceso administrador`
 
-Cuando el administrador selecciona una foto o archivo, el sistema lo sube a Firebase Storage y guarda el enlace automático en Firestore.
+También puedes entrar directamente a:
 
-## Importante
+`admin-login.html`
 
-Debes tener habilitado Firebase Storage en tu proyecto Firebase y configurar reglas que permitan subir archivos al usuario administrador autenticado.
+Acceso interno:
+
+- Usuario: `CETPRO`
+- Contraseña: `PERUHUARMEY2026`
+
+### Funciones agregadas
+
+- Menú responsive para celular.
+- Buscador global desde el ícono de lupa.
+- Filtros funcionales en programas, noticias, galería y documentos.
+- Buscadores internos funcionales.
+- Galería con ventana emergente.
+- Botones "Ver más" con modal informativo.
+- Botones de documentos con vista previa y descarga demo.
+- Formulario de contacto/matrícula con validación.
+- Preguntas frecuentes desplegables.
+- Panel administrador con guardado local mediante localStorage.
+
+### Nota importante
+
+Esto es frontend estático. Para que el panel admin actualice una web real para todos los usuarios, luego se debe conectar a un backend, base de datos o CMS como Decap CMS, Firebase, Supabase o un sistema propio.
+
+
+## Cambios solicitados en esta versión
+
+- Se colocó la imagen oficial del CETPRO en el logo superior izquierdo y en el pie de página.
+- En la portada, los 5 puntitos del banner cambian automáticamente con una transición suave.
+- Se eliminó el enlace “Ver más” de las tarjetas de Programas destacados en Inicio.
+- En la página Nosotros, el cuadro grande inicial muestra la imagen del CETPRO enviada.
+- Se mantienen los colores, textos, estructura e imágenes de carreras de la versión que gustó.
+
+
+## Matrícula
+
+El administrador puede habilitar o deshabilitar la matrícula desde `admin.html`. El estado se guarda en `localStorage` para la demostración.
+
+
+## Últimos ajustes
+
+- El administrador ya no edita Inicio ni Programas.
+- En Nosotros, el panel permite agregar, editar y eliminar docentes/directivos.
+- En Matrícula, el administrador activa o desactiva el formulario público.
+- El formulario de matrícula guarda postulantes en `localStorage` y el panel los muestra por carrera.
+- Se eliminó la selección de horario porque el horario ya está definido por carrera.
+- El acceso interno queda como candado discreto al final de Inicio.
+
+
+## Ajuste responsive solicitado
+
+- Se agregó la imagen enviada como `assets/img/logo-cetpro.png`.
+- El logo superior izquierdo de todas las páginas usa esa imagen.
+- En `nosotros.html`, el cuadro izquierdo de “Quiénes somos” usa la misma imagen institucional.
+- Se reforzó el responsive para laptop, tablet y celular sin cambiar colores ni imágenes de fondo.
+- Se mantuvieron las páginas HTML, Firebase, el panel administrador y el diseño original.
