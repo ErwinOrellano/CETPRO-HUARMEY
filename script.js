@@ -66,6 +66,11 @@ import {
     document.body.appendChild(div); setTimeout(()=>div.remove(),3200);
   }
 
+
+  function normalizeProgramasMenu(){
+    $$('.menu a[href="programas.html"]').forEach(a=>{ a.textContent='Programas'; });
+  }
+
   function setupMobileMenu(){
     const btn=$('.menu-toggle'), menu=$('.menu');
     if(!btn||!menu) return;
@@ -478,6 +483,6 @@ import {
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    setupMobileMenu(); setupGlobalSearch(); setupFilters(); setupLocalSearchBoxes(); setupModal(); setupFAQ(); setupContactForm(); setupPublicTeachers(); setupEnrollment(); setupAdmin(); setupLogin();
+    normalizeProgramasMenu(); setupMobileMenu(); setupGlobalSearch(); setupFilters(); setupLocalSearchBoxes(); setupModal(); setupFAQ(); setupContactForm(); setupPublicTeachers(); setupEnrollment(); setupAdmin(); setupLogin();
   });
 })();
