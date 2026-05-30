@@ -2,9 +2,9 @@
 /* =========================================================
    CETPRO Ernesto Reyna Zegarra - Funcionalidad Front-End
    Mantiene el diseño original y agrega administración simple
-   con localStorage para docentes y postulantes.
+   con Firebase Authentication y Cloud Firestore para todo el contenido dinámico.
    ========================================================= */
-import { auth, db } from "./firebase-config.js";
+import { auth, db, storage } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -20,6 +20,7 @@ import {
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
 (function(){
   const $=(sel,ctx=document)=>ctx.querySelector(sel);
@@ -36,7 +37,7 @@ import {
     {title:'Inicio',url:'index.html',desc:'Portada principal del CETPRO'},
     {title:'Nosotros',url:'nosotros.html',desc:'Misión, visión, valores y equipo institucional'},
     {title:'Programas',url:'programas.html',desc:'Carreras técnicas: Soldadura, Carpintería, Electricidad e Industria del Vestido'},
-    {title:'Matrícula',url:'matricula.html',desc:'Formulario de inscripción para postulantes'},
+    {title:'Inscripción',url:'matricula.html',desc:'Formulario de inscripción para postulantes'},
     {title:'Noticias',url:'noticias.html',desc:'Semana técnica, aniversario y actividades por carrera'},
     {title:'Galería',url:'galeria.html',desc:'Fotos de talleres, actividades y trabajos de estudiantes'},
     {title:'Documentos',url:'documentos.html',desc:'Reglamentos, formatos, convocatorias y documentos académicos'},
@@ -45,17 +46,17 @@ import {
 
   let teachersCache = [];
   let enrollmentsCache = [];
-  let matriculaEnabledCache = true;
+  let inscripcionEnabledCache = true;
   let adminStarted = false;
 
   function getTeachers(){ return teachersCache; }
   function getEnrollments(){ return enrollmentsCache; }
-  function getMatriculaEnabled(){ return matriculaEnabledCache; }
+  function getInscripcionEnabled(){ return inscripcionEnabledCache; }
 
-  async function saveMatriculaEnabled(value){
+  async function saveInscripcionEnabled(value){
     await setDoc(doc(db, 'configuracion', 'matricula'), {
       habilitada: Boolean(value),
-      mensajeCerrado: 'La matrícula web se encuentra cerrada temporalmente.',
+      mensajeCerrado: 'La inscripción web se encuentra cerrada temporalmente.',
       actualizadoEn: serverTimestamp()
     }, { merge: true });
   }
@@ -64,6 +65,74 @@ import {
     const old=$('.toast'); if(old) old.remove();
     const div=document.createElement('div'); div.className='toast'; div.textContent=msg;
     document.body.appendChild(div); setTimeout(()=>div.remove(),3200);
+  }
+
+
+  function escapeHTML(value){
+    return String(value||'').replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  }
+
+  function imageBg(url){
+    const clean=String(url||'').trim();
+    return clean ? `style="background-image:linear-gradient(180deg,rgba(0,38,93,.05),rgba(0,38,93,.58)),url('${escapeHTML(clean)}')"` : '';
+  }
+
+  function thumb(url){
+    const clean=String(url||'').trim();
+    return clean ? `<img class="admin-thumb" src="${escapeHTML(clean)}" alt="Imagen">` : '<span class="muted">Sin foto</span>';
+  }
+
+  function safeFileName(name){
+    return String(name||'archivo').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]/g,'_');
+  }
+
+  async function uploadSelectedFile(file, folder){
+    if(!file || !file.name) return '';
+    const fileRef = ref(storage, `${folder}/${Date.now()}_${safeFileName(file.name)}`);
+    await uploadBytes(fileRef, file);
+    return await getDownloadURL(fileRef);
+  }
+
+  async function applyUploadFromInput(form, inputName, targetField, folder, out){
+    const input=form.elements[inputName];
+    const file=input?.files?.[0];
+    if(file){
+      toast('Subiendo archivo a Firebase Storage...');
+      out[targetField]=await uploadSelectedFile(file, folder);
+    }
+  }
+
+  function itemFromForm(form, fields){
+    const data=Object.fromEntries(new FormData(form).entries());
+    const out={actualizadoEn:serverTimestamp()};
+    fields.forEach(f=>out[f]=(data[f]||'').trim());
+    return {data,out};
+  }
+
+  async function saveManaged(collectionName, form, fields, cache){
+    const {data,out}=itemFromForm(form, fields);
+    try{
+      if(collectionName==='noticias') await applyUploadFromInput(form,'imagenArchivo','imagen','noticias',out);
+      if(collectionName==='galeria') await applyUploadFromInput(form,'imagenArchivo','imagen','galeria',out);
+      if(collectionName==='documentos') await applyUploadFromInput(form,'documentoArchivo','url','documentos',out);
+
+      const required=fields.filter(f=>form.elements[f]?.hasAttribute('required'));
+      if(required.some(f=>!out[f])){ toast('Completa los campos obligatorios.'); return; }
+
+      if(collectionName==='galeria' && !out.imagen){ toast('Selecciona una imagen para la galería.'); return; }
+
+      if(data.index!==''){
+        const item=cache[Number(data.index)];
+        if(item?.id) await updateDoc(doc(db,collectionName,item.id),out);
+      }else{
+        await addDoc(collection(db,collectionName),{...out,creadoEn:serverTimestamp()});
+      }
+      form.reset(); form.elements.index.value=''; toast('Información guardada correctamente.');
+    }catch(error){ console.error(error); toast('No se pudo guardar. Revisa Firebase Storage y sus reglas.'); }
+  }
+
+  function normalizeProgramasMenu(){
+    $$('.menu a[href="programas.html"]').forEach(a=>{ a.textContent='Programas'; });
   }
 
   function setupMobileMenu(){
@@ -77,7 +146,7 @@ import {
     const search=$('.search-icon'); if(!search) return;
     const panel=document.createElement('div');
     panel.className='search-panel';
-    panel.innerHTML=`<div class="search-panel-inner"><div class="flex between"><h2>Buscar en el sitio</h2><button class="modal-close" type="button" style="color:#0b2559">×</button></div><input id="globalSearchInput" placeholder="Ejemplo: matrícula, horarios, documentos, soldadura..."><div class="search-results"></div></div>`;
+    panel.innerHTML=`<div class="search-panel-inner"><div class="flex between"><h2>Buscar en el sitio</h2><button class="modal-close" type="button" style="color:#0b2559">×</button></div><input id="globalSearchInput" placeholder="Ejemplo: inscripción, horarios, documentos, soldadura..."><div class="search-results"></div></div>`;
     document.body.appendChild(panel);
     const input=$('#globalSearchInput',panel), results=$('.search-results',panel);
     const render=(q='')=>{
@@ -139,10 +208,12 @@ import {
         e.preventDefault();
         const title=(card?.querySelector('h2,h3')?.textContent||'Información').trim();
         const text=(card?.querySelector('p')?.textContent||'Información ampliada del CETPRO.').trim();
-        open(title, `<p>${text}</p><p>Para mayor información puedes comunicarte con la institución o revisar la sección de contacto.</p><a class="btn btn-primary" href="matricula.html">Solicitar matrícula →</a>`);
+        open(title, `<p>${text}</p><p>Para mayor información puedes comunicarte con la institución o revisar la sección de contacto.</p><a class="btn btn-primary" href="matricula.html">Solicitar inscripción →</a>`);
       }
       const doc=e.target.closest('.doc-table .btn');
       if(doc){
+        const href=doc.getAttribute('href');
+        if(href && href!=='#') return;
         e.preventDefault();
         const row=doc.closest('tr'); const title=row?.querySelector('.doc-name div')?.childNodes[0]?.textContent?.trim()||'Documento';
         if(doc.textContent.includes('Descargar')){
@@ -198,7 +269,7 @@ import {
     const list=$('#staffList'); if(!list) return;
     onSnapshot(collection(db,'docentes'), snapshot=>{
       teachersCache = snapshot.docs.map(d=>({id:d.id,...d.data()}));
-      list.innerHTML=teachersCache.map(t=>`<article class="staff-card card"><div class="avatar"></div><h3>${t.nombre||''}</h3><p><strong>${t.cargo||''}</strong><br><span class="muted">${t.area||''}</span></p></article>`).join('') || '<p class="muted">Aún no hay docentes registrados.</p>';
+      list.innerHTML=teachersCache.map(t=>`<article class="staff-card card"><div class="avatar" ${imageBg(t.foto)}></div><h3>${escapeHTML(t.nombre)}</h3><p><strong>${escapeHTML(t.cargo)}</strong><br><span class="muted">${escapeHTML(t.area)}</span></p></article>`).join('') || '<p class="muted">Aún no hay docentes registrados.</p>';
     }, error=>{
       console.error(error);
       list.innerHTML='<p class="muted">No se pudieron cargar los docentes.</p>';
@@ -206,23 +277,23 @@ import {
   }
 
   function setupEnrollment(){
-    const openBox=$('#matriculaOpen');
-    const closedBox=$('#matriculaClosed');
+    const openBox=$('#inscripcionOpen');
+    const closedBox=$('#inscripcionClosed');
 
     if(openBox && closedBox){
-      const renderMatriculaState=()=>{
-        const enabled = getMatriculaEnabled();
+      const renderInscripciónState=()=>{
+        const enabled = getInscripcionEnabled();
         openBox.hidden = !enabled;
         closedBox.hidden = enabled;
       };
 
       onSnapshot(doc(db,'configuracion','matricula'), snapshot=>{
         const data=snapshot.data()||{};
-        matriculaEnabledCache = data.habilitada !== false;
-        renderMatriculaState();
+        inscripcionEnabledCache = data.habilitada !== false;
+        renderInscripciónState();
       }, error=>{
         console.error(error);
-        toast('No se pudo leer el estado de matrícula.');
+        toast('No se pudo leer el estado de inscripción.');
       });
     }
 
@@ -230,8 +301,8 @@ import {
     if(!form) return;
     form.addEventListener('submit',async e=>{
       e.preventDefault();
-      if(!getMatriculaEnabled()){
-        toast('La matrícula está deshabilitada por el administrador.');
+      if(!getInscripcionEnabled()){
+        toast('La inscripción está deshabilitada por el administrador.');
         return;
       }
       const data=Object.fromEntries(new FormData(form).entries());
@@ -267,6 +338,36 @@ import {
     });
   }
 
+
+  function setupPublicManagedContent(){
+    const newsList=$('.news-list');
+    if(newsList){
+      onSnapshot(collection(db,'noticias'), snapshot=>{
+        const items=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+        if(!items.length) return;
+        newsList.innerHTML=items.map(n=>`<article class="mini-news card"><div class="program-img" data-label="${escapeHTML(n.categoria||'Noticia')}" ${imageBg(n.imagen)}></div><h3>${escapeHTML(n.titulo)}</h3><p>${escapeHTML(n.resumen)}</p><div class="mini-meta muted">${escapeHTML(n.fecha||'')}</div><a class="btn btn-outline">Leer más →</a></article>`).join('');
+      }, error=>console.error(error));
+    }
+
+    const galleryGrid=$('.gallery-grid');
+    if(galleryGrid){
+      onSnapshot(collection(db,'galeria'), snapshot=>{
+        const items=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+        if(!items.length) return;
+        galleryGrid.innerHTML=items.map(g=>`<article class="gallery-item card"><div class="gallery-photo" data-gallery="${escapeHTML(g.categoria||'Galería')}" ${imageBg(g.imagen)}></div><h3>${escapeHTML(g.titulo)}</h3><p>${escapeHTML(g.descripcion||g.categoria||'')}</p></article>`).join('');
+      }, error=>console.error(error));
+    }
+
+    const docBody=$('.doc-table tbody');
+    if(docBody){
+      onSnapshot(collection(db,'documentos'), snapshot=>{
+        const items=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+        if(!items.length) return;
+        docBody.innerHTML=items.map(d=>`<tr><td><div class="doc-name"><span class="file-icon ${String(d.tipo||'').toLowerCase().includes('doc')?'doc':''}">${escapeHTML((d.tipo||'PDF').slice(0,3).toUpperCase())}</span><div>${escapeHTML(d.nombre)}<br><span class="badge">${escapeHTML(d.tipo||'Documento')}</span></div></div></td><td>${escapeHTML(d.descripcion)}</td><td>${escapeHTML(d.fecha||'')}</td><td><span class="type-pill">${escapeHTML(d.tipo||'PDF')}</span></td><td>${d.url?`<a class="btn btn-outline" href="${escapeHTML(d.url)}" target="_blank" rel="noopener">👁 Ver</a> <a class="btn btn-primary" href="${escapeHTML(d.url)}" target="_blank" rel="noopener">⬇ Descargar</a>`:'<span class="muted">Sin enlace</span>'}</td></tr>`).join('');
+      }, error=>console.error(error));
+    }
+  }
+
   function setupAdmin(){
     if(!document.body.classList.contains('admin-body')) return;
 
@@ -285,35 +386,35 @@ import {
       location.href='admin-login.html';
     });
 
-    const toggle=$('#matriculaToggle');
-    const statusText=$('#matriculaStatusText');
-    const statusMsg=$('#matriculaAdminMessage');
+    const toggle=$('#inscripcionToggle');
+    const statusText=$('#inscripcionStatusText');
+    const statusMsg=$('#inscripcionAdminMessage');
 
     const updateStatus=()=>{
-      const enabled=toggle ? toggle.checked : getMatriculaEnabled();
+      const enabled=toggle ? toggle.checked : getInscripcionEnabled();
       if(statusText) statusText.textContent=enabled?'Activa':'Cerrada';
-      if(statusMsg) statusMsg.textContent=enabled?'La página Matrícula mostrará el formulario de inscripción.':'La página Matrícula mostrará un aviso informativo y no recibirá postulantes.';
+      if(statusMsg) statusMsg.textContent=enabled?'La página Inscripción mostrará el formulario de inscripción.':'La página Inscripción mostrará un aviso informativo y no recibirá postulantes.';
     };
 
     if(toggle){
       onSnapshot(doc(db,'configuracion','matricula'), snapshot=>{
         const data=snapshot.data()||{};
-        matriculaEnabledCache = data.habilitada !== false;
-        toggle.checked = matriculaEnabledCache;
+        inscripcionEnabledCache = data.habilitada !== false;
+        toggle.checked = inscripcionEnabledCache;
         updateStatus();
       }, error=>{
         console.error(error);
-        toast('No se pudo cargar el estado de matrícula.');
+        toast('No se pudo cargar el estado de inscripción.');
       });
 
       toggle.addEventListener('change',async ()=>{
         try{
-          await saveMatriculaEnabled(toggle.checked);
+          await saveInscripcionEnabled(toggle.checked);
           updateStatus();
-          toast(toggle.checked?'Matrícula habilitada. El formulario público ya está disponible.':'Matrícula deshabilitada. La página pública ya mostrará el aviso informativo.');
+          toast(toggle.checked?'Inscripción habilitada. El formulario público ya está disponible.':'Inscripción deshabilitada. La página pública ya mostrará el aviso informativo.');
         }catch(error){
           console.error(error);
-          toast('No se pudo cambiar el estado de matrícula.');
+          toast('No se pudo cambiar el estado de inscripción.');
         }
       });
     }
@@ -326,7 +427,7 @@ import {
       const teachers=getTeachers();
       if(teacherCount) teacherCount.textContent=teachers.length;
       if(!teacherTbody) return;
-      teacherTbody.innerHTML=teachers.map((t,i)=>`<tr><td><strong>${t.nombre||''}</strong></td><td>${t.cargo||''}</td><td>${t.area||'-'}</td><td><button class="btn btn-outline btn-small" data-edit-teacher="${i}" type="button">Editar</button> <button class="btn btn-primary btn-small" data-delete-teacher="${i}" type="button">Eliminar</button></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Aún no hay docentes registrados.</td></tr>';
+      teacherTbody.innerHTML=teachers.map((t,i)=>`<tr><td>${thumb(t.foto)}</td><td><strong>${escapeHTML(t.nombre)}</strong></td><td>${escapeHTML(t.cargo)}</td><td>${escapeHTML(t.area)||'-'}</td><td><button class="btn btn-outline btn-small" data-edit-teacher="${i}" type="button">Editar</button> <button class="btn btn-primary btn-small" data-delete-teacher="${i}" type="button">Eliminar</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Aún no hay docentes registrados.</td></tr>';
     }
 
     onSnapshot(collection(db,'docentes'), snapshot=>{
@@ -346,9 +447,15 @@ import {
           nombre:data.nombre.trim(),
           cargo:data.cargo.trim(),
           area:(data.area||'').trim(),
+          foto:(data.foto||'').trim(),
           actualizadoEn:serverTimestamp()
         };
         try{
+          const fotoNueva = teacherForm.elements.fotoArchivo?.files?.[0];
+          if(fotoNueva){
+            toast('Subiendo foto del docente a Firebase Storage...');
+            docente.foto = await uploadSelectedFile(fotoNueva, 'docentes');
+          }
           if(data.index!==''){
             const teacher=teachersCache[Number(data.index)];
             if(teacher?.id) await updateDoc(doc(db,'docentes',teacher.id),docente);
@@ -377,6 +484,8 @@ import {
           teacherForm.elements.nombre.value=t.nombre||'';
           teacherForm.elements.cargo.value=t.cargo||'';
           teacherForm.elements.area.value=t.area||'';
+          teacherForm.elements.foto.value=t.foto||'';
+          if(teacherForm.elements.fotoArchivo) teacherForm.elements.fotoArchivo.value='';
           teacherForm.scrollIntoView({behavior:'smooth',block:'center'});
         }
 
@@ -450,6 +559,55 @@ import {
       const blob=new Blob([header+rows],{type:'text/csv;charset=utf-8'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='postulantes_cetpro.csv'; a.click(); URL.revokeObjectURL(a.href); toast('Lista descargada.');
     });
+
+    setupManagedAdmin();
+  }
+
+  function setupManagedAdmin(){
+    let newsCache=[], galleryCache=[], documentsCache=[];
+
+    const setupTable=(collectionName, formSel, tableSel, fields, renderRow, clearSel)=>{
+      const form=$(formSel), tbody=$(`${tableSel} tbody`); if(!form||!tbody) return;
+      onSnapshot(collection(db,collectionName), snapshot=>{
+        const cache=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+        if(collectionName==='noticias') newsCache=cache;
+        if(collectionName==='galeria') galleryCache=cache;
+        if(collectionName==='documentos') documentsCache=cache;
+        tbody.innerHTML=cache.map(renderRow).join('') || `<tr><td colspan="6" class="muted">Aún no hay registros.</td></tr>`;
+      }, error=>{ console.error(error); toast('No se pudieron cargar los registros.'); });
+
+      form.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const cache=collectionName==='noticias'?newsCache:(collectionName==='galeria'?galleryCache:documentsCache);
+        await saveManaged(collectionName, form, fields, cache);
+      });
+      $(clearSel)?.addEventListener('click',()=>{form.reset(); form.elements.index.value='';});
+      tbody.addEventListener('click',async e=>{
+        const edit=e.target.closest('[data-edit-managed]');
+        const del=e.target.closest('[data-delete-managed]');
+        const cache=collectionName==='noticias'?newsCache:(collectionName==='galeria'?galleryCache:documentsCache);
+        if(edit){
+          const item=cache[Number(edit.dataset.editManaged)]; if(!item) return;
+          form.elements.index.value=edit.dataset.editManaged;
+          fields.forEach(f=>{ if(form.elements[f]) form.elements[f].value=item[f]||''; });
+          ['imagenArchivo','documentoArchivo'].forEach(n=>{ if(form.elements[n]) form.elements[n].value=''; });
+          form.scrollIntoView({behavior:'smooth',block:'center'});
+        }
+        if(del){
+          const item=cache[Number(del.dataset.deleteManaged)];
+          if(item?.id && confirm('¿Eliminar este registro del sitio web?')){
+            try{ await deleteDoc(doc(db,collectionName,item.id)); toast('Registro eliminado.'); }
+            catch(error){ console.error(error); toast('No se pudo eliminar el registro.'); }
+          }
+        }
+      });
+    };
+
+    setupTable('noticias','#newsForm','#newsTable',['titulo','categoria','fecha','imagen','resumen'],(n,i)=>`<tr><td>${thumb(n.imagen)}</td><td><strong>${escapeHTML(n.titulo)}</strong><br><span class="muted">${escapeHTML(n.resumen||'')}</span></td><td>${escapeHTML(n.categoria||'-')}</td><td>${escapeHTML(n.fecha||'-')}</td><td><button class="btn btn-outline btn-small" data-edit-managed="${i}" type="button">Editar</button> <button class="btn btn-primary btn-small" data-delete-managed="${i}" type="button">Eliminar</button></td></tr>`,'#clearNewsForm');
+
+    setupTable('galeria','#galleryForm','#galleryTable',['titulo','categoria','imagen','descripcion'],(g,i)=>`<tr><td>${thumb(g.imagen)}</td><td><strong>${escapeHTML(g.titulo)}</strong></td><td>${escapeHTML(g.categoria||'-')}</td><td>${escapeHTML(g.descripcion||'-')}</td><td><button class="btn btn-outline btn-small" data-edit-managed="${i}" type="button">Editar</button> <button class="btn btn-primary btn-small" data-delete-managed="${i}" type="button">Eliminar</button></td></tr>`,'#clearGalleryForm');
+
+    setupTable('documentos','#documentForm','#managedDocumentsTable',['nombre','tipo','fecha','url','descripcion'],(d,i)=>`<tr><td><strong>${escapeHTML(d.nombre)}</strong></td><td>${escapeHTML(d.descripcion||'-')}</td><td>${escapeHTML(d.fecha||'-')}</td><td>${escapeHTML(d.tipo||'-')}</td><td><button class="btn btn-outline btn-small" data-edit-managed="${i}" type="button">Editar</button> <button class="btn btn-primary btn-small" data-delete-managed="${i}" type="button">Eliminar</button></td></tr>`,'#clearDocumentForm');
   }
 
   function setupLogin(){
@@ -478,6 +636,6 @@ import {
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    setupMobileMenu(); setupGlobalSearch(); setupFilters(); setupLocalSearchBoxes(); setupModal(); setupFAQ(); setupContactForm(); setupPublicTeachers(); setupEnrollment(); setupAdmin(); setupLogin();
+    normalizeProgramasMenu(); setupMobileMenu(); setupGlobalSearch(); setupFilters(); setupLocalSearchBoxes(); setupModal(); setupFAQ(); setupContactForm(); setupPublicTeachers(); setupPublicManagedContent(); setupEnrollment(); setupAdmin(); setupLogin();
   });
 })();
