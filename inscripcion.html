@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Inscripción | CETPRO Ernesto Reyna Zegarra</title>
+  <link rel="stylesheet" href="styles.css?v=inscripcion-final-20260530">
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-left"><span>☎ (043) 123 456</span><span>✉ informes@cetproernestoreynazegarra.edu.pe</span><span>📍 AAHH Miramar Mz R Lte 13, Huarmey - Áncash</span></div>
+      <div class="topbar-right"><span>Síguenos:</span><span>f</span><span>◎</span><span>▶</span><span>☏</span></div>
+    </div>
+  </div>
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="logo"><div class="logo-mark"><img src="assets/img/logo-cetpro.png" alt="Logo CETPRO Ernesto Reyna Zegarra"></div><div><h2>CETPRO<br>Ernesto Reyna Zegarra</h2><span>Centro de Educación Técnico Productivo Público</span></div></a>
+      <nav class="menu"><a href="index.html">Inicio</a><a href="nosotros.html">Nosotros</a><a href="programas.html">Programas</a><a class="active" href="inscripcion.html">Inscripción</a><a href="noticias.html">Noticias</a><a href="galeria.html">Galería</a><a href="documentos.html">Documentos</a><a href="contacto.html">Contacto</a></nav>
+      <button class="menu-toggle" type="button" aria-label="Abrir menú">☰</button><a class="search-icon" href="#">⌕</a>
+    </div>
+  </header>
+  <section class="hero-page" style="--hero-img:url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1800&q=80')"><div class="container"><h1>Inscripción</h1><p>Inscríbete en una de nuestras 4 carreras técnicas y construye tu futuro profesional.</p><div class="breadcrumb"><span>Inicio</span> › Inscripción</div></div></section>
+
+  <main class="container main-space inscripcion-page">
+    <section id="inscripcionOpen" class="grid inscripcion-layout">
+      <div class="card inscripcion-info">
+        <span class="badge">Proceso habilitado</span>
+        <h2 class="section-title">Formulario de inscripción</h2>
+        <p>Completa tus datos correctamente. Completa tus datos correctamente. La solicitud quedará registrada para que el administrador pueda revisarla desde su panel por carrera técnica.</p>
+        <div class="grid grid-2 inscripcion-benefits">
+          <article><div class="icon-circle">🎓</div><strong>Título oficial</strong><p>Título a nombre de la Nación como Auxiliar Técnico.</p></article>
+          <article><div class="icon-circle icon-blue">🕘</div><strong>Horarios definidos</strong><p>Turno nocturno y vespertino según carrera.</p></article>
+          <article><div class="icon-circle icon-yellow">🧰</div><strong>Formación práctica</strong><p>Aprendizaje en talleres y proyectos productivos.</p></article>
+          <article><div class="icon-circle icon-green">📍</div><strong>Huarmey - Áncash</strong><p>AAHH Miramar Mz R Lte 13.</p></article>
+        </div>
+      </div>
+      <form class="card enrollment-form" id="enrollmentForm">
+        <h2>Datos del postulante</h2>
+        <p class="muted">Los campos con * son obligatorios.</p>
+        <label>Nombre completo *<input class="form-control" name="nombre" placeholder="Ejemplo: Juan Pérez Ramos" required></label>
+        <div class="form-row">
+          <label>DNI *<input class="form-control" name="dni" placeholder="8 dígitos" maxlength="8" inputmode="numeric" required></label>
+          <label>Celular *<input class="form-control" name="celular" placeholder="9 dígitos" maxlength="9" inputmode="numeric" required></label>
+        </div>
+        <label>Correo electrónico<input class="form-control" name="correo" type="email" placeholder="opcional@correo.com"></label>
+        <label>Carrera técnica *
+          <select class="form-control" name="carrera" required>
+            <option value="">Selecciona una carrera</option>
+            <option>Mecánica de Producción (Soldadura)</option>
+            <option>Carpintería</option>
+            <option>Electricidad</option>
+            <option>Industria del Vestido</option>
+          </select>
+        </label>
+        <label>Mensaje o consulta<textarea class="form-control" name="mensaje" placeholder="Escribe alguna consulta adicional"></textarea></label>
+        <button class="btn btn-primary" type="submit" style="width:100%">Enviar inscripción →</button>
+        <p class="center muted">🔒 Tu información será tratada de forma confidencial.</p>
+      </form>
+    </section>
+    <section id="inscripcionClosed" class="card inscripcion-closed" hidden>
+      <div class="icon-circle icon-yellow">⏳</div>
+      <h2>La inscripción todavía no está habilitada</h2>
+      <p>Por ahora el administrador mantiene cerrado el formulario de inscripción. Puedes revisar nuestras carreras técnicas o comunicarte con la institución para recibir información.</p>
+      <div class="flex center-buttons"><a class="btn btn-primary" href="programas.html">Programas</a><a class="btn btn-outline" href="contacto.html">Contactar al CETPRO</a></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-top">
+      <div><div class="logo"><div class="logo-mark"><img src="assets/img/logo-cetpro.png" alt="Logo CETPRO Ernesto Reyna Zegarra"></div><div><h2>CETPRO<br>Ernesto Reyna Zegarra</h2><span>Centro de Educación Técnico Productivo Público</span></div></div><p>Formamos profesionales técnicos competentes con valores, para el desarrollo de Huarmey, Áncash y del país.</p></div>
+      <div><h3>Contacto</h3><p>📍 AAHH Miramar Mz R Lte 13, Huarmey - Áncash</p><p>☎ (043) 123 456</p><p>✉ informes@cetproernestoreynazegarra.edu.pe</p></div>
+      <div><h3>Enlaces rápidos</h3><ul><li>› Nosotros</li><li>› Programas</li><li>› Inscripción</li><li>› Noticias</li><li>› Galería</li><li>› Documentos</li></ul></div>
+      <div><h3>Horario de clases</h3><p>🌙 Carpintería, Electricidad y Mecánica de Producción: 6:30 p.m. a 10:00 p.m.</p><p>☀️ Industria del Vestido: 2:00 p.m. a 6:30 p.m.</p></div>
+      <div><h3>Ubícanos</h3><div class="mini-map"></div></div>
+    </div>
+    <div class="container footer-bottom"><span>© 2024 CETPRO Ernesto Reyna Zegarra - Todos los derechos reservados.</span><span>Transparencia | Política de privacidad | Términos y condiciones</span></div>
+  </footer>
+<script type="module" src="script.js?v=inscripcion-final-20260530"></script>
+</body>
+</html>

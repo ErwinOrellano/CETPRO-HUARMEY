@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Panel Administrador | CETPRO</title>
-  <link rel="stylesheet" href="styles.css?v=admin-ordenado-firebase-storage-20260530">
+  <link rel="stylesheet" href="styles.css?v=inscripcion-final-20260530">
 </head>
 <body class="admin-body">
 <div class="admin-shell admin-shell-focused">
@@ -41,7 +41,7 @@
         <label>Nombre completo *<input class="form-control" name="nombre" placeholder="Ejemplo: Lic. Ana Pérez Rojas" required></label>
         <label>Cargo o especialidad *<input class="form-control" name="cargo" placeholder="Ejemplo: Docente de Electricidad" required></label>
         <label>Área / Carrera<input class="form-control" name="area" placeholder="Ejemplo: Electricidad"></label>
-        <label>Foto del docente<input type="hidden" name="foto" value=""><input class="form-control" type="file" name="fotoArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se subirá a Firebase Storage.</small></label>
+        <label>Foto del docente<input type="hidden" name="foto" value=""><input class="form-control" type="file" name="fotoArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se guardará en GitHub mediante la API segura de Vercel.</small></label>
         <button class="btn btn-primary" type="submit">Guardar docente</button>
         <button class="btn btn-outline" type="button" id="clearTeacherForm">Limpiar</button>
       </form>
@@ -74,7 +74,7 @@
         <label>Título de la noticia *<input class="form-control" name="titulo" placeholder="Ejemplo: Semana técnica de Electricidad" required></label>
         <label>Categoría<input class="form-control" name="categoria" placeholder="Ejemplo: Electricidad, Aniversario"></label>
         <label>Fecha<input class="form-control" name="fecha" placeholder="Ejemplo: 30/05/2026"></label>
-        <label>Imagen de la noticia<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una imagen desde tu computadora. Se subirá a Firebase Storage.</small></label>
+        <label>Imagen de la noticia<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una imagen desde tu computadora. Se guardará en GitHub mediante la API segura de Vercel.</small></label>
         <label class="admin-form-wide">Resumen *<textarea class="form-control" name="resumen" placeholder="Escribe el resumen de la noticia" required></textarea></label>
         <button class="btn btn-primary" type="submit">Guardar noticia</button>
         <button class="btn btn-outline" type="button" id="clearNewsForm">Limpiar</button>
@@ -88,7 +88,7 @@
         <input type="hidden" name="index" value="">
         <label>Título de la foto *<input class="form-control" name="titulo" placeholder="Ejemplo: Práctica de soldadura" required></label>
         <label>Categoría<input class="form-control" name="categoria" placeholder="Ejemplo: Soldadura, Carpintería"></label>
-        <label>Imagen *<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se subirá a Firebase Storage.</small></label>
+        <label>Imagen *<input type="hidden" name="imagen" value=""><input class="form-control" type="file" name="imagenArchivo" accept="image/*"><small class="muted">Selecciona una foto desde tu computadora. Se guardará en GitHub mediante la API segura de Vercel.</small></label>
         <label>Descripción<input class="form-control" name="descripcion" placeholder="Breve descripción de la actividad"></label>
         <button class="btn btn-primary" type="submit">Guardar foto</button>
         <button class="btn btn-outline" type="button" id="clearGalleryForm">Limpiar</button>
@@ -103,7 +103,7 @@
         <label>Nombre del documento *<input class="form-control" name="nombre" placeholder="Ejemplo: Requisitos de inscripción" required></label>
         <label>Tipo<input class="form-control" name="tipo" placeholder="Ejemplo: PDF, DOC, Formato"></label>
         <label>Fecha<input class="form-control" name="fecha" placeholder="Ejemplo: 30/05/2026"></label>
-        <label>Archivo del documento<input type="hidden" name="url" value=""><input class="form-control" type="file" name="documentoArchivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"><small class="muted">Selecciona el archivo desde tu computadora. Se subirá a Firebase Storage.</small></label>
+        <label>Archivo del documento<input type="hidden" name="url" value=""><input class="form-control" type="file" name="documentoArchivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg"><small class="muted">Selecciona el archivo desde tu computadora. Se guardará en GitHub mediante la API segura de Vercel.</small></label>
         <label class="admin-form-wide">Descripción *<textarea class="form-control" name="descripcion" placeholder="Describe brevemente el documento" required></textarea></label>
         <button class="btn btn-primary" type="submit">Guardar documento</button>
         <button class="btn btn-outline" type="button" id="clearDocumentForm">Limpiar</button>
@@ -113,6 +113,6 @@
 
   </main>
 </div>
-<script type="module" src="script.js?v=admin-ordenado-firebase-storage-20260530"></script>
+<script type="module" src="script.js?v=inscripcion-final-20260530"></script>
 </body>
 </html>

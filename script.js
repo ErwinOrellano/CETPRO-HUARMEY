@@ -4,7 +4,8 @@
    Mantiene el diseño original y agrega administración simple
    con Firebase Authentication y Cloud Firestore para todo el contenido dinámico.
    ========================================================= */
-import { auth, db, storage } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
+import { GITHUB_FILES_API_BASE } from "./github-api-config.js";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -20,7 +21,6 @@ import {
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
 (function(){
   const $=(sel,ctx=document)=>ctx.querySelector(sel);
@@ -37,7 +37,7 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
     {title:'Inicio',url:'index.html',desc:'Portada principal del CETPRO'},
     {title:'Nosotros',url:'nosotros.html',desc:'Misión, visión, valores y equipo institucional'},
     {title:'Programas',url:'programas.html',desc:'Carreras técnicas: Soldadura, Carpintería, Electricidad e Industria del Vestido'},
-    {title:'Inscripción',url:'matricula.html',desc:'Formulario de inscripción para postulantes'},
+    {title:'Inscripción',url:'inscripcion.html',desc:'Formulario de inscripción para postulantes'},
     {title:'Noticias',url:'noticias.html',desc:'Semana técnica, aniversario y actividades por carrera'},
     {title:'Galería',url:'galeria.html',desc:'Fotos de talleres, actividades y trabajos de estudiantes'},
     {title:'Documentos',url:'documentos.html',desc:'Reglamentos, formatos, convocatorias y documentos académicos'},
@@ -86,19 +86,85 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
     return String(name||'archivo').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]/g,'_');
   }
 
+  function getApiBase(){
+    const base=String(GITHUB_FILES_API_BASE||'').trim().replace(/\/$/,'');
+    if(!base || base.includes('TU-PROYECTO-VERCEL')){
+      throw new Error('Configura GITHUB_FILES_API_BASE en github-api-config.js con la URL de Vercel.');
+    }
+    return base;
+  }
+
+  async function fileToBase64(file){
+    return await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');
+      reader.onerror=reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function githubApi(endpoint, options={}){
+    const user=auth.currentUser;
+    if(!user) throw new Error('Debes iniciar sesión como administrador.');
+    const idToken=await user.getIdToken();
+    const response=await fetch(`${getApiBase()}/api/${endpoint}`,{
+      ...options,
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${idToken}`,
+        ...(options.headers||{})
+      }
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok){
+      throw new Error(data.error||data.message||'No se pudo completar la operación con GitHub.');
+    }
+    return data;
+  }
+
   async function uploadSelectedFile(file, folder){
-    if(!file || !file.name) return '';
-    const fileRef = ref(storage, `${folder}/${Date.now()}_${safeFileName(file.name)}`);
-    await uploadBytes(fileRef, file);
-    return await getDownloadURL(fileRef);
+    if(!file || !file.name) return null;
+    const allowedFolders=['docentes','noticias','galeria','documentos'];
+    if(!allowedFolders.includes(folder)) throw new Error('Carpeta no permitida.');
+    toast('Subiendo archivo al repositorio de GitHub...');
+    const contentBase64=await fileToBase64(file);
+    return await githubApi('upload-github',{
+      method:'POST',
+      body:JSON.stringify({
+        fileName:file.name,
+        folder,
+        contentBase64
+      })
+    });
+  }
+
+  async function deleteGithubFileForItem(item, targetField){
+    const path=item?.[`${targetField}GithubPath`];
+    const sha=item?.[`${targetField}GithubSha`];
+    if(!path) return true;
+    try{
+      await githubApi('delete-github',{
+        method:'DELETE',
+        body:JSON.stringify({path,sha})
+      });
+      return true;
+    }catch(error){
+      console.error(error);
+      toast('No se pudo eliminar el archivo en GitHub. Intenta nuevamente.');
+      return false;
+    }
   }
 
   async function applyUploadFromInput(form, inputName, targetField, folder, out){
     const input=form.elements[inputName];
     const file=input?.files?.[0];
     if(file){
-      toast('Subiendo archivo a Firebase Storage...');
-      out[targetField]=await uploadSelectedFile(file, folder);
+      const uploaded=await uploadSelectedFile(file, folder);
+      if(uploaded?.url){
+        out[targetField]=uploaded.url;
+        out[`${targetField}GithubPath`]=uploaded.path||'';
+        out[`${targetField}GithubSha`]=uploaded.sha||'';
+      }
     }
   }
 
@@ -128,11 +194,12 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
         await addDoc(collection(db,collectionName),{...out,creadoEn:serverTimestamp()});
       }
       form.reset(); form.elements.index.value=''; toast('Información guardada correctamente.');
-    }catch(error){ console.error(error); toast('No se pudo guardar. Revisa Firebase Storage y sus reglas.'); }
+    }catch(error){ console.error(error); toast('No se pudo guardar. Revisa Firebase, Vercel y el token de GitHub.'); }
   }
 
   function normalizeProgramasMenu(){
     $$('.menu a[href="programas.html"]').forEach(a=>{ a.textContent='Programas'; });
+    $$('.menu a[href="inscripcion.html"]').forEach(a=>{ a.textContent='Inscripción'; });
   }
 
   function setupMobileMenu(){
@@ -208,7 +275,7 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
         e.preventDefault();
         const title=(card?.querySelector('h2,h3')?.textContent||'Información').trim();
         const text=(card?.querySelector('p')?.textContent||'Información ampliada del CETPRO.').trim();
-        open(title, `<p>${text}</p><p>Para mayor información puedes comunicarte con la institución o revisar la sección de contacto.</p><a class="btn btn-primary" href="matricula.html">Solicitar inscripción →</a>`);
+        open(title, `<p>${text}</p><p>Para mayor información puedes comunicarte con la institución o revisar la sección de contacto.</p><a class="btn btn-primary" href="inscripcion.html">Solicitar inscripción →</a>`);
       }
       const doc=e.target.closest('.doc-table .btn');
       if(doc){
@@ -453,8 +520,12 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
         try{
           const fotoNueva = teacherForm.elements.fotoArchivo?.files?.[0];
           if(fotoNueva){
-            toast('Subiendo foto del docente a Firebase Storage...');
-            docente.foto = await uploadSelectedFile(fotoNueva, 'docentes');
+            const uploaded=await uploadSelectedFile(fotoNueva, 'docentes');
+            if(uploaded?.url){
+              docente.foto=uploaded.url;
+              docente.fotoGithubPath=uploaded.path||'';
+              docente.fotoGithubSha=uploaded.sha||'';
+            }
           }
           if(data.index!==''){
             const teacher=teachersCache[Number(data.index)];
@@ -493,8 +564,10 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
           const i=Number(del.dataset.deleteTeacher), t=teachersCache[i];
           if(t?.id && confirm('¿Eliminar este docente del sitio web?')){
             try{
+              const githubDeleted=await deleteGithubFileForItem(t,'foto');
+              if(!githubDeleted) return;
               await deleteDoc(doc(db,'docentes',t.id));
-              toast('Docente eliminado.');
+              toast('Docente y archivo eliminado correctamente.');
             }catch(error){
               console.error(error);
               toast('No se pudo eliminar el docente.');
@@ -596,7 +669,13 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
         if(del){
           const item=cache[Number(del.dataset.deleteManaged)];
           if(item?.id && confirm('¿Eliminar este registro del sitio web?')){
-            try{ await deleteDoc(doc(db,collectionName,item.id)); toast('Registro eliminado.'); }
+            try{
+              const targetField=collectionName==='documentos'?'url':'imagen';
+              const githubDeleted=await deleteGithubFileForItem(item,targetField);
+              if(!githubDeleted) return;
+              await deleteDoc(doc(db,collectionName,item.id));
+              toast('Registro y archivo eliminado correctamente.');
+            }
             catch(error){ console.error(error); toast('No se pudo eliminar el registro.'); }
           }
         }

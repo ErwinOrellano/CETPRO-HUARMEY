@@ -1,51 +1,52 @@
-# CETPRO Ernesto Reyna Zegarra - Firebase completo
+# CETPRO Ernesto Reyna Zegarra - Firebase gratis + GitHub para archivos
 
-Este proyecto mantiene el diseño original del sitio web, pero el contenido administrable está preparado para trabajar con **Firebase Authentication**, **Cloud Firestore** y **Firebase Storage**.
+Este proyecto mantiene el diseño original del sitio web y evita Firebase Storage para no usar el plan Blaze.
 
-## Cambios principales
+## Qué usa
 
-- El menú superior mantiene siempre la opción **Programas**.
-- En el sitio público se cambió **Inscripción** por **Inscripción**.
-- El formulario público se mantiene en `matricula.html`, pero visualmente aparece como **Inscripción**.
-- No se agregó otro archivo de inscripción; se conserva `matricula.html` para no romper Firebase ni enlaces existentes.
-- El panel interno ya no usa guardado local para el contenido administrable.
+- Firebase Authentication: ingreso del administrador.
+- Cloud Firestore: textos, docentes, inscripción, postulantes, noticias, galería, documentos y mensajes.
+- GitHub API mediante Vercel Functions: subir y eliminar fotos/documentos desde el panel web.
+- GitHub Pages: publicación del sitio web.
 
-## Panel interno
+## Archivos nuevos importantes
 
-Desde `admin.html`, el personal autorizado puede administrar:
+- `github-api-config.js`: aquí se coloca la URL del proyecto publicado en Vercel.
+- `api/upload-github.js`: sube archivos al repositorio de GitHub.
+- `api/delete-github.js`: elimina archivos del repositorio de GitHub.
+- `package.json`: permite que Vercel instale `firebase-admin`.
 
-- Docentes: agregar, editar, eliminar y subir foto desde la computadora.
-- Inscripción: activar o desactivar el formulario público.
-- Postulantes: revisar postulantes registrados por carrera.
-- Noticias: agregar, editar, eliminar y subir imagen desde la computadora.
-- Galería: agregar, eliminar y subir fotos desde la computadora.
-- Documentos: agregar, editar, eliminar y subir archivos PDF, Word, Excel, PowerPoint o imágenes desde la computadora.
+## Variables que debes configurar en Vercel
 
-## Firebase usado
-
-### Firestore
-
-Colecciones/documentos usados:
-
-- `docentes`
-- `postulantes`
-- `noticias`
-- `galeria`
-- `documentos`
-- `mensajes`
-- `configuracion / matricula`
-
-### Storage
-
-Carpetas usadas:
-
-- `docentes/`
-- `noticias/`
-- `galeria/`
-- `documentos/`
-
-Cuando el administrador selecciona una foto o archivo, el sistema lo sube a Firebase Storage y guarda el enlace automático en Firestore.
+```env
+GITHUB_OWNER=erwinorellano
+GITHUB_REPO=CETPRO-HUARMEY
+GITHUB_BRANCH=main
+GITHUB_TOKEN=TU_TOKEN_FINE_GRAINED_DE_GITHUB
+ADMIN_EMAILS=huarmey@cetpro.com
+FIREBASE_PROJECT_ID=TU_PROJECT_ID_DE_FIREBASE
+FIREBASE_CLIENT_EMAIL=TU_CLIENT_EMAIL_DEL_SERVICE_ACCOUNT
+FIREBASE_PRIVATE_KEY=TU_PRIVATE_KEY_DEL_SERVICE_ACCOUNT
+ALLOWED_ORIGIN=https://erwinorellano.github.io
+```
 
 ## Importante
 
-Debes tener habilitado Firebase Storage en tu proyecto Firebase y configurar reglas que permitan subir archivos al usuario administrador autenticado.
+Después de publicar el proyecto en Vercel, copia la URL que te da Vercel y colócala en `github-api-config.js`.
+
+Ejemplo:
+
+```js
+export const GITHUB_FILES_API_BASE = "https://cetpro-huarmey-api.vercel.app";
+```
+
+## Carpetas para archivos
+
+Los archivos subidos desde el panel se guardan automáticamente en:
+
+- `assets/docentes/`
+- `assets/noticias/`
+- `assets/galeria/`
+- `assets/documentos/`
+
+Cuando eliminas un docente, noticia, imagen de galería o documento desde el panel, también se intenta eliminar su archivo correspondiente del repositorio de GitHub.

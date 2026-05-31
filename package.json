@@ -1,0 +1,9 @@
+{
+  "name": "cetpro-huarmey-github-api",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
